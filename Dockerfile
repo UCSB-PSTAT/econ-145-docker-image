@@ -1,5 +1,3 @@
-LABEL maintainer="Vanessa Deleon <v_deleon@ucsb.edu>"
-
 ARG BASE_IMAGE=jupyter/r-notebook:r-4.1.0
 FROM $BASE_IMAGE
 
@@ -34,16 +32,15 @@ RUN \
     # modifying littler scripts to conda R location
     sed -i 's/\/usr\/local\/lib\/R\/site-library/\/opt\/conda\/lib\/R\/library/g' \
         ${LITTLER}/examples/*.r && \
-  ln -s ${LITTLER}/bin/r ${LITTLER}/examples/*.r /usr/local/bin/ && \
-  echo "$R_HOME/lib" | sudo tee -a /etc/ld.so.conf.d/littler.conf && \
-  ldconfig
-
+	ln -s ${LITTLER}/bin/r ${LITTLER}/examples/*.r /usr/local/bin/ && \
+	echo "$R_HOME/lib" | sudo tee -a /etc/ld.so.conf.d/littler.conf && \
+	ldconfig
+    
 USER $NB_USER
 
 RUN pip install nbgitpuller okpy && \
     pip install git+https://github.com/okpy/jassign.git && \
-    pip install jupyter-server-proxy jupyter-rsession-proxy
-
+    pip install jupyter-server-proxy jupyter-rsession-proxy 
 USER $NB_USER
 
 RUN conda install -y r-base && \
@@ -53,7 +50,7 @@ RUN conda install -y r-base && \
     conda install -c conda-forge r-units && \
     conda install -c conda-forge r-sf
 
-RUN R -e "install.packages(c('tidyverse', 'janitor', 'readxl', 'lubridate', 'lucid', 'magrittr', 'learnr', 'haven', 'summarytools', 'ggplot2', 'kableExtra', 'flextable', 'sf', 'viridis', 'titanic', 'labelled', 'Lahman', 'babynames', 'nasaweather', 'fueleconomy', 'mapproj'), repos = 'http://cran.us.r-project.org')"
+RUN R -e "install.packages(c('tidyverse', 'tidylog', 'tidytuesdayR', 'janitor', 'readxl', 'lubridate', 'lucid', 'magrittr', 'learnr', 'haven', 'summarytools', 'ggplot2', 'kableExtra', 'flextable', 'sandwich', 'sf', 'stargazer', 'viridis', 'titanic', 'labelled', 'Lahman', 'babynames', 'nasaweather', 'fueleconomy', 'mapproj', 'forcats', 'rvest', 'readxl', 'quantmod', 'polite', 'pdftools', 'ncfd4', 'modelsummary', 'maps', 'magritter', 'lubridate', 'lmtest', 'knitr', 'anytime', 'broom', 'devtools', 'fixest', 'ggmap', 'ggplot2', 'ggthemes', 'httr', 'janitor', 'jsonlite', 'kableExtra'), repos = 'http://cran.us.r-project.org')"
 
 RUN R --quiet -e "devtools::install_github('UrbanInstitute/urbnmapr', dep=FALSE)"
 RUN R --quiet -e "devtools::install_github('rapporter/pander')"
@@ -63,4 +60,3 @@ RUN rm -rf ~/.cache/pip ~/.cache/matplotlib ~/.cache/yarn && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
-
