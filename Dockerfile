@@ -4,8 +4,10 @@ FROM $BASE_IMAGE
 USER root
 
 ENV PATH=$PATH:/usr/lib/rstudio-server/bin \
-    R_HOME=/opt/conda/lib/R
-ARG LITTLER=$R_HOME/library/littler
+    R_HOME=/opt/conda/lib/R \
+    RSESSION_PROXY_RSTUDIO_1_4=yes
+ARG LITTLER=$R_HOME/library/littler \
+    RSERVER_WWW_ROOT_PATH=/user/$JUPYTERHUB_USER/rstudio
 
 RUN \
     # download R studio
@@ -43,14 +45,8 @@ RUN pip install nbgitpuller okpy && \
     pip install jupyter-server-proxy jupyter-rsession-proxy 
 USER $NB_USER
 
-RUN conda install -y r-base && \
-    conda install -c conda-forge udunits2 && \
-    conda install -c conda-forge imagemagick && \
-    conda install -c conda-forge r-rstan && \
-    conda install -c conda-forge r-units && \
-    conda install -c conda-forge r-sf
-
-RUN R -e "install.packages(c('tidyverse', 'tidylog', 'tidytuesdayR', 'janitor', 'readxl', 'lubridate', 'lucid', 'magrittr', 'learnr', 'haven', 'summarytools', 'ggplot2', 'kableExtra', 'flextable', 'sandwich', 'sf', 'stargazer', 'viridis', 'titanic', 'labelled', 'Lahman', 'babynames', 'nasaweather', 'fueleconomy', 'mapproj', 'forcats', 'rvest', 'readxl', 'quantmod', 'polite', 'pdftools', 'ncfd4', 'modelsummary', 'maps', 'magritter', 'lubridate', 'lmtest', 'knitr', 'anytime', 'broom', 'devtools', 'fixest', 'ggmap', 'ggplot2', 'ggthemes', 'httr', 'janitor', 'jsonlite', 'kableExtra'), repos = 'http://cran.us.r-project.org')"
+# REmoving some packages that are probably duplicated
+RUN R -e "install.packages(c('r-sf', 'r-units', 'r-stan', 'udunits2', 'majick', 'tidylog', 'tidytuesdayR', 'janitor', 'readxl', 'lubridate', 'lucid', 'magrittr', 'learnr', 'haven', 'summarytools', 'ggplot2', 'kableExtra', 'flextable', 'sandwich', 'sf', 'stargazer', 'viridis', 'titanic', 'labelled', 'Lahman', 'babynames', 'nasaweather', 'fueleconomy', 'mapproj', 'forcats', 'rvest', 'readxl', 'quantmod', 'polite', 'pdftools', 'ncfd4', 'modelsummary', 'maps', 'magritter', 'lubridate', 'lmtest', 'knitr', 'anytime', 'broom', 'devtools', 'fixest', 'ggmap', 'ggplot2', 'ggthemes', 'httr', 'janitor', 'jsonlite', 'kableExtra'), repos = 'http://cran.us.r-project.org')"
 
 RUN R --quiet -e "devtools::install_github('UrbanInstitute/urbnmapr', dep=FALSE)"
 RUN R --quiet -e "devtools::install_github('rapporter/pander')"
