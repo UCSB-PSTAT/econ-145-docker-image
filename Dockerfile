@@ -6,8 +6,7 @@ USER root
 ENV PATH=$PATH:/usr/lib/rstudio-server/bin \
     R_HOME=/opt/conda/lib/R \
     RSESSION_PROXY_RSTUDIO_1_4=yes
-ARG LITTLER=$R_HOME/library/littler \
-    RSERVER_WWW_ROOT_PATH=/user/$JUPYTERHUB_USER/rstudio
+ARG LITTLER=$R_HOME/library/littler
 
 RUN \
     # download R studio
