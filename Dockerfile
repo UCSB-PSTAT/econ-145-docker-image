@@ -54,5 +54,4 @@ RUN R --quiet -e "devtools::install_github('rapporter/pander')"
 RUN rm -rf ~/.cache/pip ~/.cache/matplotlib ~/.cache/yarn && \
     conda clean --all -f -y && \
     fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
-#     
+    fix-permissions /home/$NB_USER     
