@@ -36,7 +36,16 @@ RUN \
 	ln -s ${LITTLER}/bin/r ${LITTLER}/examples/*.r /usr/local/bin/ && \
 	echo "$R_HOME/lib" | sudo tee -a /etc/ld.so.conf.d/littler.conf && \
 	ldconfig
+
+RUN \
+    # Install libfreetype6-dev to meet systemfont dependency
+    apt-get update && \
+    apt-get install -y libfreetype6-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* 
     
+
+
 USER $NB_USER
 
 RUN pip install nbgitpuller okpy && \
@@ -44,12 +53,15 @@ RUN pip install nbgitpuller okpy && \
     pip install jupyter-server-proxy jupyter-rsession-proxy 
 USER $NB_USER
 
-# REmoving some packages that are probably duplicated
-RUN conda install -c conda-forge udunits2 libv8 r-rstan imagemagick r-sf
+# Removing some packages that are probably duplicated
+RUN conda install -c conda-forge udunits2 libv8 r-rstan imagemagick r-sf r-kableextra
 RUN R -e "install.packages(c('rsf', 'units', 'udunits2', 'magick', 'tidylog', 'tidytuesdayR', 'janitor', 'readxl', 'lubridate', 'lucid', 'magrittr', 'learnr', 'haven', 'summarytools', 'ggplot2', 'kableExtra', 'flextable', 'sandwich', 'sf', 'stargazer', 'viridis', 'titanic', 'labelled', 'Lahman', 'babynames', 'nasaweather', 'fueleconomy', 'mapproj', 'forcats', 'rvest', 'readxl', 'quantmod', 'polite', 'pdftools', 'ncdf4', 'modelsummary', 'maps', 'lubridate', 'lmtest', 'knitr', 'anytime', 'broom', 'devtools', 'fixest', 'ggmap', 'ggplot2', 'ggthemes', 'httr', 'janitor', 'jsonlite', 'kableExtra'), repos = 'http://cran.us.r-project.org')"
 
 RUN R --quiet -e "devtools::install_github('UrbanInstitute/urbnmapr', dep=FALSE)"
 RUN R --quiet -e "devtools::install_github('Rapporter/pander')"
+
+
+# Adding packages to install kableExtra
 
 # remove cache
 RUN rm -rf ~/.cache/pip ~/.cache/matplotlib ~/.cache/yarn && \
